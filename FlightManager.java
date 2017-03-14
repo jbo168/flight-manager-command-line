@@ -5,32 +5,36 @@ import java.text.*;
 
 public class FlightManager
 {
-	public static ArrayList<ArrayList<String>> Airports;
-	public static ArrayList<ArrayList<String>> Flights;
+	public static ArrayList<ArrayList<String>> airports;
+	public static ArrayList<ArrayList<String>> flights;
 
 	/*
 		John Long
 		Jamie McLoughlin
+		-The main method performs the appropriate action if the user input is valid and the files exist
 	*/
 	public static void main (String [] args) throws IOException
 	{
-		String pattern = "AA|EA|DA|EF|DF|SF|SD";
-		if(args.length<2 || args.length>5)
-			displayMessage(0);
-		else if(!(args[0].matches(pattern)))
-			displayMessage(1);
+		boolean readFile = readFilesIntoArrayLists();
+		boolean input = validateInput(args);
+		
+		if(!readFile)
+			displayMessage(8);
 		else
-		{	
-			switch(args[0])
+		{
+			if(input)
 			{
-				case "AA": addAirport(args);											break;
-				case "EA": editAirportName();											break;
-				case "DA": deleteAirport();												break;
-				case "EF": editFlights();												break;
-				case "DF": deleteFlight();												break;
-				case "SF": searchFlights();												break;
-				case "SD": searchFlights();												break;		
-			}		
+				switch(args[0])
+				{
+					case "AA": addAirportToArrayList(args[1],args[2]);								break;
+					case "EA": editAirportName(args[1],args[2]);									break;
+					case "DA": deleteAirportFromArrayList(args[1]);									break;
+					case "EF": editFlightTimes(args[1],args[2],args[3],args[4]);					break;
+					case "DF": deleteFlightDetailsFromArrayList(args[1]);							break;
+					case "SF": searchFlights(args,args[1],args[2]);									break;
+					//case "SD": searchFlights(args[1],args[2],args[3]);								break;		
+				}		
+			}
 		}
 	}
 
@@ -44,13 +48,13 @@ public class FlightManager
 		File inputFile1 = new File (fileName1);
 		File inputFile2 = new File (fileName2);
 			
-		Airports = new ArrayList<ArrayList<String>>();
-		Flights = new ArrayList<ArrayList<String>>();
+		airports = new ArrayList<ArrayList<String>>();
+		flights = new ArrayList<ArrayList<String>>();
 		
 		for (int i = 0 ; i < topicsColumns ; i++)
-			Airports.add(new ArrayList<String>());
+			airports.add(new ArrayList<String>());
 		for (int i = 0 ; i < userPassColumns ; i++)
-			Flights.add(new ArrayList<String>());
+			flights.add(new ArrayList<String>());
 		
 		
 		if(inputFile1.exists() && inputFile2.exists())
@@ -61,7 +65,7 @@ public class FlightManager
 			{
 				fileElements = (sc.nextLine()).split(",");
 				for (int i = 0; i < topicsColumns; i++)
-					Airports.get(i).add(fileElements[i]);
+					airports.get(i).add(fileElements[i]);
 			}
 			sc.close();
 			sc = new Scanner(inputFile2);
@@ -69,7 +73,7 @@ public class FlightManager
 			{
 				fileElements = (sc.nextLine()).split(",");
 				for (int i = 0; i < userPassColumns; i++)
-					Flights.get(i).add(fileElements[i]);
+					flights.get(i).add(fileElements[i]);
 			}
 			sc.close();
 			return true;
@@ -84,48 +88,60 @@ public class FlightManager
 		boolean validInput = true;
 		String pattern = "AA|EA|DA|EF|DF|SF|SD";
 		userInput[0] = userInput[0].toUpperCase();
-		
-		switch(userInput[0])
+		if(userInput.length<2 || userInput.length>5)
 		{
-			case "AA": 
-				if(userInput.length != 3)
-					displayMessage(0);
-				else
-				{
-					if(userInput[2].length() != 3 || (!(userInput[2].matches(pattern1))))
+			validInput = false;
+			displayMessage(0);
+		}
+		else if(!(userInput[0].matches(pattern)))
+			{
+				validInput = false;
+				displayMessage(1);
+			}
+		else
+		{
+			switch(userInput[0])
+			{
+				case "AA": 
+					if(userInput.length != 3)
+						displayMessage(0);
+					else
 					{
-						displayMessage(2);
-						validInput = false;
+						if(userInput[2].length() != 3 || (!(userInput[2].matches(pattern1))))
+						{
+							displayMessage(2);
+							validInput = false;
+						}
 					}
-				}
-				break;
+					break;
 
-			case "EA":
-				if(userInput.length != 3)
-					displayMessage(0);
-				break;
+				case "EA":
+					if(userInput.length != 3)
+						displayMessage(0);
+					break;
 
-			case "DA":
-				if(userInput.length != 2)
-					displayMessage(0);
-				break;
-			case "EF":
-				if(userInput.length != 5)
-					displayMessage(0);
-				break;
-			case "DF":
-				if(userInput.length != 2)
-					displayMessage(0);
-				break;
-			case "SF":
-				if(userInput.length != 3)
-					displayMessage(0);
-				break;
-			case "SD":
-				if(userInput.length != 4)
-					displayMessage(0);
-				break;
+				case "DA":
+					if(userInput.length != 2)
+						displayMessage(0);
+					break;
+				case "EF":
+					if(userInput.length != 5)
+						displayMessage(0);
+					break;
+				case "DF":
+					if(userInput.length != 2)
+						displayMessage(0);
+					break;
+				case "SF":
+					if(userInput.length != 3)
+						displayMessage(0);
+					break;
+				case "SD":
+					if(userInput.length != 4)
+						displayMessage(0);
+					break;
 
+			}
 		}
 		return validInput;
 	}
@@ -150,6 +166,8 @@ public class FlightManager
 			case 4:	msg = "Airport details added.";											break;
 			case 5:	msg = "Invalid departure date format.";									break;
 			case 6: msg = "Invalid arrivala date format.";									break;
+			case 7: msg = "No flight details available";									break;
+			case 8: msg = "File named Airports.txt or Flights.txt doesn't exist";			break;
 		}
 		System.out.println(msg);
 		displayInstructions();
@@ -175,31 +193,81 @@ public class FlightManager
 		System.out.println("*****************************************************************************************");
 	}
 
+	/*
+		John Long
+		Jamie McLoughlin
+	*/
+	public static void searchFlights(String[] input,String source, String destination)
+	{
+		String aSource = "";
+		String aDestination = "";
+		int matches = 0;
+		if(input.length == 3)
+		{
+			aSource = getAirportCode(source);
+			aDestination = getAirportCode(destination);
+			for(int i=0; i<flights.get(0).size(); i++)
+			{
+				if(aSource.equals(flights.get(1).get(i)) && aDestination.equals(flights.get(2).get(i)))
+				{
+					// Display flight details
+					for(int j=0; j<8; j++)
+					{
+						System.out.print(flights.get(j).get(i));
+					}
+					System.out.println("");
+					matches++;
+				}
+			}
+			if (matches==0)
+				displayMessage(7);
+		}
+	}
+
+	/*
+		John Long
+		-This method gets the airport code for a particular airport name
+		-It returns a String and takes 1 parameter a String which is the name of the airport
+	*/
+	public static String getAirportCode(String name)
+	{
+		boolean found = false;
+		String airportCode = "";
+		for(int i = 0;i<airports.get(0).size() && !found;i++)
+		{
+			if(name.equalsIgnoreCase(airports.get(0).get(i)))
+			{
+				airportCode = airports.get(0).get(i);
+				found = true;
+			}
+		}
+		return airportCode;
+	}
 
 	public static void editAirportName(String code, String name) throws IOException
 	{
 		int index = findIndexOfAirCode(code);
 		System.out.println(index);
-		Airports.get(0).set(index,name);
-		writingToAirportsFile();
+		airports.get(0).set(index,name);
+		writeToAirportsFile();
 	}
 	
 	public static void editFlightTimes(String code, String days,String startDate, String endDate) throws IOException
 	{
 		int index = findIndexOfFlightCode(code);
-		Flights.get(5).set(index,days);
-		Flights.get(6).set(index,startDate);
-		Flights.get(7).set(index,endDate);
-		writingToFlightsFile();
+		flights.get(5).set(index,days);
+		flights.get(6).set(index,startDate);
+		flights.get(7).set(index,endDate);
+		writeToFlightsFile();
 	}
 	
 	public static int findIndexOfAirCode(String code)
 	{
 		int index = -1;
 		boolean found = false;
-		for(int i = 0;i<Airports.get(1).size() && !found;i++)
+		for(int i = 0;i<airports.get(1).size() && !found;i++)
 		{
-			if(code.equals(Airports.get(1).get(i)))
+			if(code.equals(airports.get(1).get(i)))
 			{
 				index = i;
 				found = true;
@@ -207,22 +275,6 @@ public class FlightManager
 		}
 		return index;
 	}
-
-	public static int findIndexOfFlightCode(String code)
-	{
-		int index = -1;
-		boolean found = false;
-		for(int i = 0;i<Flights.get(0).size() && !found;i++)
-		{
-			if(code.equals(Flights.get(0).get(i)))
-			{
-				index = i;
-				found = true;
-			}
-		}
-		return index;
-	}
-
 
 
 	//AA: Add Airport (part 1)
@@ -324,5 +376,4 @@ public class FlightManager
 		}
 		return index;
 	}
-	
 }
