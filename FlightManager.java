@@ -31,8 +31,8 @@ public class FlightManager
 					case "DA": deleteAirportFromArrayList(args[1]);									break;
 					case "EF": editFlightTimes(args[1],args[2],args[3],args[4]);					break;
 					case "DF": deleteFlightDetailsFromArrayList(args[1]);							break;
-					case "SF": searchFlights(args,args[1],args[2]);									break;
-					//case "SD": searchFlights(args[1],args[2],args[3]);								break;		
+					case "SF": searchFlightsSF(args[1],args[2]);									break;
+					case "SD": searchFlightsSD(args[1],args[2],args[3]);							break;		
 				}		
 			}
 		}
@@ -196,38 +196,78 @@ public class FlightManager
 	/*
 		John Long
 		Jamie McLoughlin
+		-This method searches for flights by departing airport and destination airport and prints the details of all
+		 relevant flights
+		-It takes 2 arguments, the source and destination airports as Strings
+		-It returns void
 	*/
-	public static void searchFlights(String[] input,String source, String destination)
+	public static void searchFlightsSF(String source, String destination)
 	{
 		String aSource = "";
 		String aDestination = "";
 		int matches = 0;
-		if(input.length == 3)
+		
+		aSource = getAirportCode(source);
+		aDestination = getAirportCode(destination);
+		
+		for(int i=0; i<flights.get(0).size(); i++)
 		{
-			aSource = getAirportCode(source);
-			aDestination = getAirportCode(destination);
-			for(int i=0; i<flights.get(0).size(); i++)
+			if(aSource.equals(flights.get(1).get(i)) && aDestination.equals(flights.get(2).get(i)))
 			{
-				if(aSource.equals(flights.get(1).get(i)) && aDestination.equals(flights.get(2).get(i)))
+				// Display flight details
+				for(int j=0; j<8; j++)
 				{
-					// Display flight details
-					for(int j=0; j<8; j++)
-					{
-						System.out.print(flights.get(j).get(i));
-					}
-					System.out.println("");
-					matches++;
+					System.out.print(flights.get(j).get(i));
 				}
+				System.out.println("");
+				matches++;
 			}
-			if (matches==0)
-				displayMessage(7);
 		}
+		if (matches==0)
+			displayMessage(7);
+		
+	}
+
+	/*
+		John Long
+		Jamie McLoughlin
+		-This method searches for flights by departing airport, destination airport and departure date and prints the details of all
+		 relevant flights
+		-It takes 3 arguments, the source and destination airports as Strings and the departure date as a String
+		-It returns void
+	*/
+	public static void searchFlightsSD(String source, String destination, String date)
+	{
+		String aSource = "";
+		String aDestination = "";
+		String aDate = "";
+		int matches = 0;
+
+		aSource = getAirportCode(source);
+		aDestination = getAirportCode(destination);
+		aDate = date;
+
+		for(int i=0; i<flights.get(0).size(); i++)
+		{
+			if(aSource.equals(flights.get(1).get(i)) && aDestination.equals(flights.get(2).get(i)) && aDate.equals(flights.get(6).get(i)))
+			{
+				// Display flight details
+				for(int j=0; j<8; j++)
+				{
+					System.out.print(flights.get(j).get(i));
+				}
+				System.out.println("");
+				matches++;
+			}
+		}
+		if (matches==0)
+			displayMessage(7);
 	}
 
 	/*
 		John Long
 		-This method gets the airport code for a particular airport name
-		-It returns a String and takes 1 parameter a String which is the name of the airport
+		-It returns a String and takes 1 parameter, a String which is the name of the airport
 	*/
 	public static String getAirportCode(String name)
 	{
