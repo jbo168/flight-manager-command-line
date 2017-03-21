@@ -13,7 +13,7 @@ public class FlightManager
 		Jamie McLoughlin
 		-The main method performs the appropriate action if the user input is valid and the files exist
 	*/
-	public static void main (String [] args) throws IOException
+	public static void main (String [] args) throws IOException, ParseException
 	{
 		boolean readFile = readFilesIntoArrayLists();
 		boolean input = validateInput(args);
@@ -82,69 +82,158 @@ public class FlightManager
 			return false;
 	}
 
-	public static boolean validateInput(String[] userInput)
-	{
-		String pattern1 = "[A-Za-z]{3}";
+	    public static boolean validateInput(String[] userInput) 
+    {
+		String pattern1 = "AA|EA|DA|EF|DF|SF|SD";
+		String pattern2 = "[A-Za-z]{3}";
+		String pattern3 = "[A-Za-z]{2}\\d{3,5}";
+		String pattern4 = "([a-zA-Z]+)|((([a-zA-Z]+\\s)+)[a-zA-Z]+)";
+		String pattern5 = "[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}";
+		String pattern6 = "[-M]{1}[-T]{1}[-W]{1}[-T]{1}[-F]{1}[-S]{2}";
 		boolean validInput = true;
-		String pattern = "AA|EA|DA|EF|DF|SF|SD";
-		userInput[0] = userInput[0].toUpperCase();
-		if(userInput.length<2 || userInput.length>5)
-		{
-			validInput = false;
-			displayMessage(0);
-		}
-		else if(!(userInput[0].matches(pattern)))
-			{
-				validInput = false;
-				displayMessage(1);
-			}
-		else
-		{
-			switch(userInput[0])
-			{
-				case "AA": 
-					if(userInput.length != 3)
-						displayMessage(0);
-					else
-					{
-						if(userInput[2].length() != 3 || (!(userInput[2].matches(pattern1))))
+		
+        if(userInput.length < 2 || userInput.length > 5)
+        {
+            validInput = false;
+            displayMessage(0);
+        }
+        else if(!(userInput[0].matches(pattern1)))
+        {
+            validInput = false;
+            displayMessage(1);
+        }
+        else
+        {
+            switch(userInput[0])
+            {
+                case "AA":	
+                    if(userInput.length != 3)
+                        displayMessage(0);
+                    else
+                    {
+                        if (!(userInput[1].matches(pattern4)))
 						{
-							displayMessage(2);
-							validInput = false;
-						}
-					}
-					break;
-
-				case "EA":
-					if(userInput.length != 3)
-						displayMessage(0);
-					break;
-
-				case "DA":
-					if(userInput.length != 2)
-						displayMessage(0);
-					break;
-				case "EF":
-					if(userInput.length != 5)
-						displayMessage(0);
-					break;
-				case "DF":
-					if(userInput.length != 2)
-						displayMessage(0);
-					break;
-				case "SF":
-					if(userInput.length != 3)
-						displayMessage(0);
-					break;
-				case "SD":
-					if(userInput.length != 4)
-						displayMessage(0);
-					break;
-
-			}
-		}
-		return validInput;
-	}
+                            displayMessage(3);
+                            validInput = false;
+                        }
+						else if(userInput[2].length() != 3 || (!(userInput[2].matches(pattern2))))
+                        {
+                            displayMessage(2);
+                            validInput = false;
+                        }	
+                    }
+                    break;
+                case "EA":						
+                    if(userInput.length != 3)
+                        displayMessage(0); 
+					else
+                    {
+                        if(userInput[1].length() != 3 || (!(userInput[1].matches(pattern2))))
+                        {
+                            displayMessage(2);
+                            validInput = false;
+                        }
+						else if (!(userInput[2].matches(pattern4)))
+						{
+                            displayMessage(3);
+                            validInput = false;
+                        }	
+                    }
+                    break;
+                case "DA":						
+                    if(userInput.length != 2)
+                        displayMessage(0);
+					else
+                    {
+                        if(userInput[1].length() != 3 || (!(userInput[1].matches(pattern2))))
+                        {
+                            displayMessage(2);
+                            validInput = false;
+                        }
+                    }
+                    break;
+                case "EF":
+                    if(userInput.length != 5)
+                        displayMessage(0);
+					else
+                    {
+                        if(!(userInput[1].matches(pattern3)))
+                        {
+                            displayMessage(1);
+                            validInput = false;
+                        }
+						else if(!(userInput[2].matches(pattern6)))
+                        {
+                            displayMessage(9);
+                            validInput = false;
+                        }
+						else if(!(userInput[3].matches(pattern5)))
+                        {
+                            displayMessage(5);
+                            validInput = false;
+                        }
+						else if(!(userInput[4].matches(pattern5)))
+                        {
+                            displayMessage(6);
+                            validInput = false;
+                        }
+                    }
+                    break;
+                case "DF":
+                    if(userInput.length != 2)
+                        displayMessage(0);
+					else
+                    {
+                        if(!(userInput[1].matches(pattern3)))
+                        {
+                            displayMessage(1);
+                            validInput = false;
+                        }
+                    }
+                    break;
+                case "SF":
+                    if(userInput.length != 3)
+                        displayMessage(0);
+					else
+                    {
+                        if (!(userInput[1].matches(pattern4)))
+						{
+                            displayMessage(3);
+                            validInput = false;
+                        }
+						if (!(userInput[2].matches(pattern4)))
+						{
+                            displayMessage(3);
+                            validInput = false;
+                        }
+                    }
+                    break;
+                case "SD":
+                    if(userInput.length != 4)
+                        displayMessage(0);
+					else
+                    {
+                        if (!(userInput[1].matches(pattern4)))
+						{
+                            displayMessage(3);
+                            validInput = false;
+                        }
+						else if (!(userInput[2].matches(pattern4)))
+						{
+                            displayMessage(3);
+                            validInput = false;
+                        }
+						else if(!(userInput[3].matches(pattern5)))
+                        {
+                           displayMessage(7);
+                            validInput = false;
+                        }
+                    }
+                    break;
+            }
+        }
+        return validInput;
+    }
 
 	/*
 		John Long
@@ -159,15 +248,17 @@ public class FlightManager
 		String msg ="";
 		switch(msgNum)
 		{
-			case 0: msg = "Invalid number of command-line arguments.";						break;
-			case 1:	msg = "Invalid first command-line argument.";							break;
-			case 2:	msg = "Airport code must be three alphabetic characters in length.";	break;
-			case 3:	msg = "Airport already exists.";										break;
-			case 4:	msg = "Airport details added.";											break;
-			case 5:	msg = "Invalid departure date format.";									break;
-			case 6: msg = "Invalid arrivala date format.";									break;
-			case 7: msg = "No flight details available";									break;
-			case 8: msg = "File named Airports.txt or Flights.txt doesn't exist";			break;
+			case 0: msg = "Invalid number of command-line arguments.";                      break;	
+            case 1: msg = "Invalid Airport flight code.";                           		break;	
+            case 2: msg = "Airport code must be three alphabetic characters in length.";    break;	
+            case 3: msg = "Airport names must be alphabetic characters.";                   break;	
+            case 4: msg = "Airport details added.";                             			break;
+            case 5: msg = "Invalid departure date format.";                                 break;
+            case 6: msg = "Invalid arrivala date format.";                                  break;
+            case 7: msg = "Invalid date format";                                  			break;  
+            case 8: msg = "File named Airports.txt or Flights.txt doesn't exist";           break;	
+			case 9: msg = "Invalid day format";         									break;	
+			case 10: msg = "No matches found";												break;
 		}
 		System.out.println(msg);
 		displayInstructions();
@@ -175,7 +266,6 @@ public class FlightManager
 
 	/*
 		John Long
-		Jamie McLoughlin
 		-This method takes no arguments and returns void
 		-Simply displays how to use the FlightManager program
 	*/
@@ -195,7 +285,6 @@ public class FlightManager
 
 	/*
 		John Long
-		Jamie McLoughlin
 		-This method searches for flights by departing airport and destination airport and prints the details of all
 		 relevant flights
 		-It takes 2 arguments, the source and destination airports as Strings
@@ -212,7 +301,7 @@ public class FlightManager
 		
 		for(int i=0; i<flights.get(0).size(); i++)
 		{
-			if(aSource.equals(flights.get(1).get(i)) && aDestination.equals(flights.get(2).get(i)))
+			if(aSource.equalsIgnoreCase(flights.get(1).get(i)) && aDestination.equalsIgnoreCase(flights.get(2).get(i)))
 			{
 				// Display flight details
 				for(int j=0; j<8; j++)
@@ -223,33 +312,47 @@ public class FlightManager
 				matches++;
 			}
 		}
-		if (matches==0)
-			displayMessage(7);
+		if (matches == 0)
+			displayMessage(10);
 		
 	}
 
 	/*
 		John Long
-		Jamie McLoughlin
 		-This method searches for flights by departing airport, destination airport and departure date and prints the details of all
 		 relevant flights
 		-It takes 3 arguments, the source and destination airports as Strings and the departure date as a String
 		-It returns void
 	*/
-	public static void searchFlightsSD(String source, String destination, String date)
+	
+	public static void searchFlightsSD(String source, String destination, String date) throws ParseException
 	{
 		String aSource = "";
 		String aDestination = "";
-		String aDate = "";
 		int matches = 0;
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/mm/yyyy");
+		Date date1 = sdf.parse(date);
 
 		aSource = getAirportCode(source);
 		aDestination = getAirportCode(destination);
-		aDate = date;
+		boolean display1;
+		boolean display2;
 
 		for(int i=0; i<flights.get(0).size(); i++)
 		{
-			if(aSource.equals(flights.get(1).get(i)) && aDestination.equals(flights.get(2).get(i)) && aDate.equals(flights.get(6).get(i)))
+			Date date2 = sdf.parse(flights.get(6).get(i));
+			display1 = false;
+		    display2 = false;
+			if(aSource.equalsIgnoreCase(flights.get(1).get(i)) && aDestination.equalsIgnoreCase(flights.get(2).get(i)))
+			{
+				display1 = true;				
+			}
+			
+			if(date1.equals(date2))
+				display2 = true;
+
+			if(display1 == true && display2 == true)
 			{
 				// Display flight details
 				for(int j=0; j<8; j++)
@@ -260,8 +363,9 @@ public class FlightManager
 				matches++;
 			}
 		}
-		if (matches==0)
-			displayMessage(7);
+		
+		if(matches==0)
+			displayMessage(10);
 	}
 
 	/*
@@ -273,7 +377,7 @@ public class FlightManager
 	{
 		boolean found = false;
 		String airportCode = "";
-		for(int i = 0;i<airports.get(0).size() && !found;i++)
+		for(int i = 0; i<airports.get(0).size() && !found; i++)
 		{
 			if(name.equalsIgnoreCase(airports.get(0).get(i)))
 			{
